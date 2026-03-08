@@ -1,0 +1,41 @@
+{
+  "Version": "2012-10-17",
+  "Comment": "UniEvent EC2 Instance Policy — CE 308/408 Assignment 1",
+  "Statement": [
+    {
+      "Sid": "S3EventMediaAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": [
+        "arn:aws:s3:::unievent-media-bucket",
+        "arn:aws:s3:::unievent-media-bucket/*"
+      ]
+    },
+    {
+      "Sid": "CloudWatchLogsAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:*:log-group:/unievent/*"
+    },
+    {
+      "Sid": "EC2DescribeSelf",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeTags"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

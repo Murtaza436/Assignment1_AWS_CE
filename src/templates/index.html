@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniEvent — GIKI University Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">U</span>
+        <span class="logo-text">Uni<em>Event</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="#events">Events</a>
+        <a href="#upload">Upload</a>
+        <a href="#architecture">Architecture</a>
+      </div>
+      <button class="btn-primary" onclick="refreshEvents()">↻ Refresh</button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="badge">🎓 GIKI · CE 308/408 Cloud Computing</div>
+      <h1>University<br/><em>Events</em></h1>
+      <p>Discover workshops, society drives, festivals &amp; more — powered by AWS cloud infrastructure.</p>
+      <div class="hero-stats">
+        <div class="stat"><span id="stat-count">{{ events|length }}</span><label>Live Events</label></div>
+        <div class="stat"><span>99.9%</span><label>Uptime SLA</label></div>
+        <div class="stat"><span>2</span><label>AZs Active</label></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="arch-diagram">
+        <div class="arch-layer" style="--d:0s">🌐 Internet</div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer alb" style="--d:.1s">⚖️ ALB</div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-layer ec2" style="--d:.2s">🖥 EC2 AZ-A</div>
+          <div class="arch-layer ec2" style="--d:.3s">🖥 EC2 AZ-B</div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer s3" style="--d:.4s">🪣 S3 Bucket</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── EVENTS GRID ── -->
+  <main>
+    <section id="events" class="section">
+      <div class="section-header">
+        <h2>Upcoming <em>Events</em></h2>
+        <p>Fetched live from Ticketmaster API · Cached in S3 for resilience</p>
+        <div id="api-badge" class="api-badge">🔴 Loading…</div>
+      </div>
+
+      <div class="events-grid" id="events-grid">
+        {% for event in events %}
+        <article class="event-card" style="--i:{{ loop.index0 }}">
+          <div class="card-image">
+            <img src="{{ event.image_url }}" alt="{{ event.title }}"
+                 onerror="this.src='/static/images/default_event.png'" />
+            <span class="category-tag">{{ event.category }}</span>
+          </div>
+          <div class="card-body">
+            <time>📅 {{ event.date }}{% if event.time != 'TBA' %} · {{ event.time[:5] }}{% endif %}</time>
+            <h3>{{ event.title }}</h3>
+            <p class="venue">📍 {{ event.venue }}{% if event.city %}, {{ event.city }}{% endif %}</p>
+            <p class="desc">{{ event.description[:140] }}{% if event.description|length > 140 %}…{% endif %}</p>
+            <a href="{{ event.ticket_url }}" class="btn-card" target="_blank">View Details →</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ── UPLOAD ── -->
+    <section id="upload" class="section upload-section">
+      <div class="section-header">
+        <h2>Upload <em>Event Poster</em></h2>
+        <p>Securely stored in Amazon S3 with private-subnet EC2 backend</p>
+      </div>
+      <div class="upload-card">
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">☁️</div>
+          <p>Drag &amp; drop your event poster here</p>
+          <span>PNG, JPG, WEBP up to 10 MB</span>
+          <input type="file" id="file-input" accept="image/*" />
+          <button class="btn-primary" onclick="document.getElementById('file-input').click()">Choose File</button>
+        </div>
+        <div id="upload-result" class="upload-result hidden"></div>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE ── -->
+    <section id="architecture" class="section arch-section">
+      <div class="section-header">
+        <h2>AWS <em>Architecture</em></h2>
+        <p>Designed following AWS Well-Architected Framework</p>
+      </div>
+      <div class="arch-cards">
+        <div class="arch-card">
+          <span class="arch-icon">🔐</span>
+          <h4>IAM</h4>
+          <p>Least-privilege roles for EC2 instances. Separate policies for S3 read/write, CloudWatch logging, and API access.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-icon">🌐</span>
+          <h4>VPC</h4>
+          <p>Custom VPC with public subnets (ALB) and private subnets (EC2). NAT Gateway for outbound API calls. Two AZs for HA.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-icon">🖥</span>
+          <h4>EC2 (Auto Scaling)</h4>
+          <p>t3.micro instances in private subnets. Auto Scaling Group across AZ-A and AZ-B. Health checks replace failed instances.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-icon">🪣</span>
+          <h4>S3</h4>
+          <p>Two prefixes: <code>media/</code> for event posters and <code>cache/</code> for API response JSON. Versioning enabled.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-icon">⚖️</span>
+          <h4>Elastic Load Balancer</h4>
+          <p>Application Load Balancer in public subnets. Routes HTTPS to healthy EC2 targets. Sticky sessions disabled for stateless scaling.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-icon">🔗</span>
+          <h4>Ticketmaster API</h4>
+          <p>Periodic fetch via cron (every 15 min). Events cached to S3 so the app stays up even if the external API is down.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <p>CE 308/408 Cloud Computing · Assignment 1 · GIKI 2025</p>
+    <p>Built on AWS: IAM · VPC · EC2 · S3 · ELB</p>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
