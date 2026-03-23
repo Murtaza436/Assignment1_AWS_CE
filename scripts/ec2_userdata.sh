@@ -17,7 +17,7 @@ dnf install -y python3 python3-pip git nginx
 
 # ── 2. Clone application from GitHub ─────────────────────────────
 cd /opt
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/Assignment1_AWS_CE.git unievent
+git clone https://github.com/Murtaza436/Assignment1_AWS_CE.git unievent
 cd unievent/src
 
 # ── 3. Python dependencies ────────────────────────────────────────
@@ -25,7 +25,7 @@ pip3 install flask boto3 requests gunicorn
 
 # ── 4. Environment variables ──────────────────────────────────────
 cat > /opt/unievent/src/.env <<'ENVEOF'
-TICKETMASTER_API_KEY=YOUR_TICKETMASTER_API_KEY_HERE
+TICKETMASTER_API_KEY=	z4GY8GpPFrQgh0G7iJTDJlijAWBRJ212
 S3_BUCKET_NAME=unievent-media-bucket
 AWS_REGION=us-east-1
 ENVEOF

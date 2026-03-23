@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ── Environment Variables (set via EC2 User Data or .env) ──────────────────────
-TICKETMASTER_API_KEY = os.environ.get("TICKETMASTER_API_KEY", "YOUR_API_KEY_HERE")
+TICKETMASTER_API_KEY = os.environ.get("TICKETMASTER_API_KEY", "	z4GY8GpPFrQgh0G7iJTDJlijAWBRJ212")
 S3_BUCKET_NAME       = os.environ.get("S3_BUCKET_NAME", "unievent-media-bucket")
 AWS_REGION           = os.environ.get("AWS_REGION", "us-east-1")
 
