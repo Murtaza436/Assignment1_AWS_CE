@@ -1,5 +1,7 @@
 # UniEvent — University Event Management System on AWS
 ### CE 308/408 Cloud Computing · Assignment 1 · GIKI
+## 🌐 Live Demo
+http://UniEvent-ALB-862031874.us-east-1.elb.amazonaws.com
 
 > A production-grade, fault-tolerant web application deployed on AWS that automatically fetches university events from the **Ticketmaster Discovery API**, stores media in **Amazon S3**, and serves traffic through an **Application Load Balancer** across multiple **EC2 instances** in private subnets.
 
